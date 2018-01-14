@@ -1,0 +1,13 @@
+{
+    "port": 9090,
+    "bodyLimit": "100kb",
+    "corsHeaders": [
+        "Link"
+    ],
+    "cassandra": {
+        "endpoints": ["localhost"],
+        "user": "cassandra",
+        "password": "cassandra",
+        "defaultFetchSize": 20
+    }
+}
