@@ -8,15 +8,17 @@ import withStyles from "material-ui/es/styles/withStyles";
 import IconButton from "material-ui/es/IconButton/IconButton";
 import Typography from "material-ui/es/Typography/Typography";
 import TextField from "material-ui/TextField/TextField";
+import SearchBar from './SearchBar'
 
 const styles = theme => ({
     flex: {
         flex: 1,
     },
     refreshButton: {
-        marginLeft: -12,
-        marginRight: 20,
     },
+    numberField: {
+        width: 80,
+    }
 });
 
 
@@ -38,6 +40,10 @@ class TopBar extends Component {
                         </label>
                     )}
 
+                    {!this.props.search ? null : (
+                        <SearchBar onRequestSearch={this.props.onRequestSearch}/>
+                    )}
+
                     <ListSelect id={"keyspace-select"}
                                 label={"keyspace"}
                                 list={this.props.keyspaceList}
@@ -52,6 +58,7 @@ class TopBar extends Component {
                     />
 
                     <TextField type="number"
+                               className={classes.numberField}
                                defaultValue={this.props.fetchSize+""}
                                label="fetch size"
                                inputProps={{
@@ -84,8 +91,7 @@ TopBar.propTypes = {
     onKeyspaceChange: PropTypes.func.isRequired,
     onTableChange: PropTypes.func.isRequired,
     onRefresh: PropTypes.func.isRequired,
-    onFetchSizeChange: PropTypes.func.isRequired,
-
+    onFetchSizeChange: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(TopBar)

@@ -34,8 +34,23 @@ export default ({ config, db, cluster }) => {
             const pageState = req.query.nextToken || undefined;
             const fetchSize = req.query.fetchSize || config.cassandra.defaultFetchSize;
             const options = { pageState : pageState, prepare : true, fetchSize : fetchSize};
-            let data = [];
-            db.eachRow("SELECT * FROM " + table.keyspaceName + "." + table.name, [], options,
+            let data = [],
+                query = "SELECT * FROM " + table.keyspaceName + "." + table.name,
+                params = [];
+
+            if (req.query.search) {
+                let esQuery = {
+                    query: {
+                        query_string : {
+                            query : req.query.search
+                        }
+                    }
+                };
+                query = `${query} WHERE es_query = ? LIMIT 500`;
+                params.push(JSON.stringify(esQuery))
+            }
+            console.log(query, params)
+            db.eachRow(query, params, options,
                 (n, row) => data.push(row),
                 (err, rs) => {
                     if (err) {

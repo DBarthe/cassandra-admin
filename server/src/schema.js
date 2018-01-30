@@ -1,8 +1,6 @@
 import cassandra from 'cassandra-driver'
 
 class Loader {
-    table_name;
-
     /**
      * Create a schema loader
      * @param {Cluster} cluster
@@ -54,13 +52,36 @@ class Loader {
         });
     }
 
+    loadIndexes() {
+        const query = "SELECT * FROM system_schema.indexes WHERE keyspace_name = ? AND table_name = ?";
+        return Promise.all(
+            this.cluster.getKeyspaces()
+                .map(ks => ks.getTables())
+                .reduce((acc, x) => { acc.push(...x); return acc })
+                .map(table => {
+                    this.client.execute(query, [ table.keyspaceName, table.name], { prepare: true })
+                        .then(result => {
+                            const find = result.rows.find(row =>
+                                row.kind === "CUSTOM" &&
+                                row.options.class_name === "org.elassandra.index.ExtendedElasticSecondaryIndex"
+                            );
+                            const esIndex = find !== undefined;
+                            table.esIndex = esIndex;
+                        })
+                })
+        ).then(() => this.cluster)
+    }
+
     /**
      * (Re)Load everything
      * @returns {Promise<Cluster>} a promise containing the cluster object.
      */
     loadAll() {
         this.cluster.clear();
-        return this.loadKeyspaces().then(() => this.loadTables()).then(() => this.loadColumns())
+        return this.loadKeyspaces()
+            .then(() => this.loadTables())
+            .then(() => this.loadColumns())
+            .then(() => this.loadIndexes())
     }
 }
 
@@ -80,6 +101,10 @@ class Cluster {
     getKeyspace(name) {
         return this.keyspaces[name];
     }
+
+    getKeyspaces() {
+        return Object.keys(this.keyspaces).map(name => this.getKeyspace(name));
+    }
 }
 
 class Keyspace {
@@ -96,12 +121,17 @@ class Keyspace {
     getTable(name) {
         return this.tables[name];
     }
+
+    getTables() {
+        return Object.keys(this.tables).map(name => this.getTable(name));
+    }
 }
 
 class Table {
     constructor(keyspaceName, name) {
         this.keyspaceName = keyspaceName;
         this.name = name;
+        this.esIndex = false;
         this.columns = {}
     }
 

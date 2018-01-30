@@ -58,7 +58,8 @@ class App extends Component {
             table: "",
             error: null,
             selectedColumn: null,
-            fetchSize: 500
+            fetchSize: 500,
+            searchString: null
         };
 
         this.handleKeyspaceChange = this.handleKeyspaceChange.bind(this);
@@ -102,6 +103,11 @@ class App extends Component {
 
     handleFetchSizeChange(fetchSize) {
         this.setState({ fetchSize: Math.max(1, fetchSize) })
+    }
+
+    handleRequestSearch(searchString) {
+        searchString = searchString.trim();
+        this.setState({ searchString: searchString !== "" ? searchString : null })
     }
 
     static redirectUrl(keyspace, table) {
@@ -148,6 +154,17 @@ class App extends Component {
         return list;
     }
 
+    search() {
+        const { error, schema } = this.state;
+        const { keyspace, table } = this.props;
+
+        return !(error || schema === null || keyspace === "" || table === "" ||
+            schema[keyspace] === undefined || schema[keyspace].tables[table] === undefined ||
+            schema[keyspace].tables[table].esIndex === false ||
+            schema[keyspace].tables[table].columns["es_query"] === undefined
+        );
+    }
+
     render() {
         const { classes } = this.props;
 
@@ -175,9 +192,13 @@ class App extends Component {
                 onFetchSizeChange={this.handleFetchSizeChange}
                 column={this.state.selectedColumn}
                 fetchSize={this.state.fetchSize}
+                search={this.search()}
+                onRequestSearch={(s) => this.handleRequestSearch(s)}
             />
         )
     }
+
+
 
     renderBody() {
         const { error, schema } = this.state;
@@ -205,7 +226,8 @@ class App extends Component {
 
         return <TableContainer tableSchema={schema[keyspace].tables[table]}
                                onColumnSelect={this.handleColumnSelect.bind(this)}
-                               fetchSize={this.state.fetchSize}/>
+                               fetchSize={this.state.fetchSize}
+                               searchString={this.state.searchString}/>
     }
 }
 

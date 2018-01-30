@@ -2,11 +2,12 @@ import React, {Component} from 'react';
 import HotTable from 'react-handsontable';
 import axios from "axios";
 import PropTypes from "prop-types";
-import { apiUrl } from './settings'
+import { apiUrl } from './settings';
 
 class TableCache {
-    constructor(keyspaceName, tableName) {
+    constructor(keyspaceName, tableName, { searchString }) {
         this.keyspaceName = keyspaceName;
+        this.searchString = searchString;
         this.tableName = tableName;
         this.data = [];
         this.nextToken = null;
@@ -16,7 +17,8 @@ class TableCache {
         return axios.get(`${apiUrl}/${this.keyspaceName}/${this.tableName}`, {
             params: {
                 fetchSize: fetchSize,
-                nextToken: nextToken || undefined
+                nextToken: nextToken || undefined,
+                search: this.searchString || undefined
             }
         }).then(res => res.data);
     }
@@ -53,7 +55,8 @@ class TableContainer extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.tableSchema !== this.props.tableSchema) {
+        if (nextProps.tableSchema !== this.props.tableSchema
+            || nextProps.searchString !== this.props.searchString) {
             this.setState({
                 loading: false,
                 tableCache: null,
@@ -63,8 +66,10 @@ class TableContainer extends Component {
     }
 
     loadData(capacity) {
+        console.log("load data");
         let tableCache = this.state.tableCache ||
-            new TableCache(this.props.tableSchema.keyspaceName, this.props.tableSchema.name);
+            new TableCache(this.props.tableSchema.keyspaceName, this.props.tableSchema.name,
+                { searchString: this.props.searchString });
 
         this.setState(prev => ({...prev, loading: true, tableCache}));
 
@@ -266,6 +271,12 @@ class HotTableAdapter extends Component {
             afterSelection: this.handleSelect,
             afterDeselect: this.handleDeselect.bind(this)
         }
+    }
+
+    static serialize(value, type) {
+    }
+
+    static unserialize(value, type) {
     }
 
     handleChange(changes, source) {
