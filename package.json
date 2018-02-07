@@ -6,10 +6,12 @@
     "scripts": {
         "dev": "nodemon -w src --exec \"babel-node src --presets es2015,stage-0\"",
         "debug": "nodemon --inpect=3001 -w src --exec \"babel-node src --presets es2015,stage-0\"",
-        "build": "babel src -s -D -d dist --presets es2015,stage-0",
+        "build": "babel src -s -D -d dist --presets es2015,stage-0 && cd client && npm run build && cd .. && cp -r client/build dist/public",
         "start": "node dist",
         "prestart": "npm run -s build",
-        "test": "eslint src"
+        "test": "eslint src",
+        "docker-build": "npm run -s build && docker build . -t strapdata/eladmin",
+        "docker-publish": "docker push strapdata/eladmin:latest"
     },
     "eslintConfig": {
         "extends": "eslint:recommended",

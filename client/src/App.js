@@ -5,9 +5,9 @@ import {
     Switch
 } from 'react-router-dom'
 import axios from "axios";
-import Reboot from "material-ui/es/Reboot/Reboot";
+import Reboot from "material-ui/Reboot/Reboot";
 import TopBar from "./TopBar";
-import withStyles from "material-ui/es/styles/withStyles";
+import withStyles from "material-ui/styles/withStyles";
 import TableContainer from "./Table";
 import { apiUrl } from './settings'
 

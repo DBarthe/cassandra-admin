@@ -132,3 +132,4 @@ typings/
 client/build
 server/dist
 client/.env.local
+dist

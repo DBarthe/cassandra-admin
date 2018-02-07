@@ -1,12 +1,12 @@
 import React, {Component} from 'react';
 import {Refresh} from 'material-ui-icons';
 import ListSelect from './ListSelect';
-import AppBar from "material-ui/es/AppBar/AppBar";
-import Toolbar from "material-ui/es/Toolbar/Toolbar";
+import AppBar from "material-ui/AppBar/AppBar";
+import Toolbar from "material-ui/Toolbar/Toolbar";
 import PropTypes from "prop-types";
-import withStyles from "material-ui/es/styles/withStyles";
-import IconButton from "material-ui/es/IconButton/IconButton";
-import Typography from "material-ui/es/Typography/Typography";
+import withStyles from "material-ui/styles/withStyles";
+import IconButton from "material-ui/IconButton/IconButton";
+import Typography from "material-ui/Typography/Typography";
 import TextField from "material-ui/TextField/TextField";
 import SearchBar from './SearchBar'
 

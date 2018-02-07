@@ -1,5 +1,6 @@
 {
     "port": 9090,
+    "publicDir": "public",
     "bodyLimit": "100kb",
     "corsHeaders": [
         "Link"

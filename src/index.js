@@ -8,6 +8,7 @@ import middleware from './middleware';
 import api from './api';
 import config from './config.json';
 import schema from './schema'
+import path from 'path'
 
 let app = express();
 app.server = http.createServer(app);
@@ -34,6 +35,8 @@ initializeDb (db => {
 
         // api router
         app.use('/api', api({ config, db, cluster }));
+
+        app.use(express.static(process.env.PUBLIC_DIR || path.join(__dirname, config.publicDir)));
 
         app.server.listen(process.env.PORT || config.port, () => {
             console.log(`Started on port ${app.server.address().port}`);
