@@ -36,14 +36,16 @@ initializeDb (db => {
         // api router
         app.use('/api', api({ config, db, cluster }));
 
-        app.use(express.static(process.env.PUBLIC_DIR || path.join(__dirname, config.publicDir)));
+				const staticDir = process.env.PUBLIC_DIR || path.join(__dirname, config.publicDir)
+        app.use(express.static(staticDir));
+				app.get('/*', (req, res) => {
+				  res.sendFile(`${staticDir}/index.html`);
 
+				});
         app.server.listen(process.env.PORT || config.port, () => {
             console.log(`Started on port ${app.server.address().port}`);
         });
-
     });
-
 });
 
 export default app;
